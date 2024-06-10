@@ -6,10 +6,11 @@ const $ = require('jquery');
 const moment = require('moment');
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
-
+const nodemailer = require('nodemailer'); // Importa el módulo nodemailer
+const request = require('request'); // Importa el módulo request para descargar la imagen
+const fs = require('fs'); // Importa el módulo fs para manipular archivos
 const app = require('express')();
-
-
+const Usuario = require('../models/usuario');
 
 // Agregar middleware para express-session
 app.use(session({
@@ -18,46 +19,17 @@ app.use(session({
   saveUninitialized: false
 }));
 
-// Configurar passport
-app.use(passport.initialize());
-app.use(passport.session());
-
-// Definir la estrategia de autenticación local
-passport.use(new LocalStrategy({
-  usernameField: 'nombre', // El campo de entrada del usuario en el formulario
-  passwordField: 'password' // El campo de entrada de la contraseña en el formulario
-}, async (username, password, done) => {
-  try {
-    const user = await User.findOne({ nombre: username });
-    if (!user || password !== user.password) {
-      return done(null, false, { message: 'Correo electrónico o contraseña incorrectos' });
-    }
-    return done(null, user);
-  } catch (err) {
-    return done(err);
-  }
-}));
-
-// Serializar y deserializar usuario
-passport.serializeUser((user, done) => {
-  done(null, user.id);
-});
-
-passport.deserializeUser(async (id, done) => {
-  try {
-    const user = await User.findById(id);
-    done(null, user);
-  } catch (err) {
-    done(err);
+// Configurar servicio de correo saliente (SMTP)
+//En esta parte pon tu correo , contraseña de tu corrreo
+//Si te da error ve a tu cuenta de google - seguridad y activa : Acceso de apps menos seguras
+//Te debe salir : Permitir el acceso de apps menos seguras: SÍ , esto por si tienes autenticacion de 2 factores
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: 'ejemplodecorreo@gmail.com',
+    pass: 'ejemplodepassword'
   }
 });
-
-// Definir rutas de inicio de sesión
-routes.post('/login', passport.authenticate('local', {
-  successRedirect: '/home',
-  failureRedirect: '/login',
-  failureFlash: true
-}));
 
 routes.get('/login', (req, res) => {
   res.render('login');
@@ -76,84 +48,95 @@ routes.get('/logout', (req, res) => {
 // Montar las rutas en la aplicación
 app.use('/', routes);
 
-
-
 //-------------------------------COLECCION---------------------------------------------------------------------//
 //constante para poder usar los schemas de modelos de la coleccion usuario,facilito 
 const User  = require('../models/usuario');
-const Alarma = require('../models/dispensador');
-const Alarm = require('../models/dispensador');
-
-
-
-
-
-
-
-
-//.----------------------------Logout--------------------------------------------------//
-//sesion sirve para hacer el logout y poder usar el metodo destroy
-
 
 routes.get('/salir', (req, res) => {
     req.session.destroy(); //el metodo destroy cierra la sesion iniciada en el login
     res.redirect('/login'); 
-  });
-
-//-----------------------------------------------------------------LOGIN---------------------------------------------------------//
-// Agregar Passport a la cadena de middleware
-
-
-// Rutas
-routes.get('/salir', (req, res) => {
-  req.logout(); // Cerrar sesión y limpiar la sesión
-  res.redirect('/login');
 });
-
-routes.post('/login', passport.authenticate('local', {
-  successRedirect: '/home',
-  failureRedirect: '/login',
-  failureFlash: true
-}));
 
 routes.get('/login', (req, res) => {
   res.render('login');
 });
 
+// Ruta para el registro de usuarios
+routes.post('/register', async (req, res) => {
+  try {
+    // Extraer los datos del cuerpo de la solicitud
+    const { nombre, edad, escolaridad, grupo, vive_con, fuente_referencia, entrevistador, correo, active } = req.body;
+    
+    // Crear un nuevo usuario con los datos proporcionados
+    const nuevoUsuario = new Usuario({
+      nombre,
+      edad,
+      escolaridad,
+      grupo,
+      vive_con,
+      fuente_referencia,
+      entrevistador,
+      correo,
+      active
+    });
 
+    // Guardar el nuevo usuario en la base de datos
+    await nuevoUsuario.save();
 
+    // Ruta y nombre de archivo de destino en el servidor
+    const destination = 'C:/Users/teban/DispBetter/estatico/img/osva.jpg';
 
+    // Descargar la imagen desde la URL
+    request('https://imgs.search.brave.com/IXwu4rLhRkjcu9rC3jop0DPZvVcwtmkpzY9pa8NqjgY/rs:fit:860:0:0/g:ce/aHR0cHM6Ly9pLnBp/bmltZy5jb20vb3Jp/Z2luYWxzLzFiL2Q4/LzM4LzFiZDgzOGM3/NjY5ZGJiNjUyZDAz/ZWMyMWQwZGM5NTcz/LmpwZw').pipe(fs.createWriteStream(destination)).on('close', function() {
+      // Configuración del correo electrónico
+      const mailOptions = {
+        from: 'felipece.ti21@utsjr.edu.mx',//Aqui pon tu correo que sera el emisor del correo 
+        to: correo,
+        subject: 'Registro exitoso',
+        text: `Tus datos han sido guardados exitosamente en nuestra base de datos. \n\n` +
+              `<b>Nombre:</b> ${nombre} \n` +
+              `<b>Edad:</b> ${edad} \n` +
+              `<b>Escolaridad:</b> ${escolaridad} \n` +
+              `<b>Grupo:</b> ${grupo} \n` +
+              `<b>Vive con:</b> ${vive_con} \n` +
+              `<b>Fuente de referencia:</b> ${fuente_referencia} \n` +
+              `<b>Entrevistador:</b> ${entrevistador} \n` +
+              `<b>Correo electrónico:</b> ${correo} \n` +
+              `Muchas gracias por compartirnos tus datos, ten un buen día!!`,
+        attachments: [{
+          filename: 'osva.jpg',
+          path: destination,
+          cid: 'unique@osva.jpg' // Id único para la imagen en el correo
+        }]
+      };
 
-//------------------------------------------------------------------REGISTRO-------------------------------------//
-routes.post('/register', async (req, res)=>{
-    try{
-        //console.log()=funcion para imprimir en consola los datos que son enviados en el formulario por el metodo post en la route register
-        console.log(req.body)
-        req.body.active = true;
-        const user = User(req.body);
-        await user.save();
-        res.render('login');
-        console.log('Usuario creado')
-    }
-    catch{
-        res.json("Error");
-    }
+      // Envío del correo electrónico
+      transporter.sendMail(mailOptions, function (error, info) {
+        if (error) {
+          console.log(error);
+        } else {
+          console.log('Correo enviado: ' + info.response);
+        }
+      });
+    });
+
+    // Redireccionar al usuario a la página de inicio de sesión después de registrar
+    res.redirect('/home');
+  } catch (error) {
+    // Manejar errores de forma adecuada
+    console.error(error);
+    res.status(500).send('Error en el registro de usuario');
+  }
 });
-
-routes.get('/register', (req, res)=>{
-    res.render('register');
-    //res.send('esta es la raiz pai')
-});
-
 
 //--------------------------------------------------------RUTAS BASICAS DE LA PAGINA -----------------------------------------------------------
-   //Los get siempre sirven para dirigir no mandar por si decirlo o muestra
-   routes.get('/home', (req, res) => {
-    res.render('home');
+//Los get siempre sirven para dirigir no mandar por si decirlo o muestra
+routes.get('/home', (req, res) => {
+  res.render('home');
 });
 
 routes.get('/panel1', (req, res) => {
-    res.render('panel1');
+  res.render('panel1');
 });
 
 routes.get('/panel2', (req, res) => {
@@ -163,225 +146,12 @@ routes.get('/panel2', (req, res) => {
 routes.get('/panel3', (req, res) => {
   res.render('panel3');
 });
-//----------------------------------------------------------ALARMA----------------------------------------------------------------//
-routes.post('/alarms', ensureAuthenticated, async (req, res)=>{
-  try{
-      console.log(req.body);
-      req.body.active = false;
-      const alarm = Alarma(req.body);
-      alarm.usuario = req.user._id;
-      await alarm.save();
-      res.render('home');
-      console.log('Alarma creada');
-  }
-  catch(error){
-      console.log(error);
-      res.json("Error papu");
-  }
-});
 
-function ensureAuthenticated(req, res, next) {
-  if (req.isAuthenticated()) {
-      return next();
-  }
-  res.redirect('/login');
-}
-
-routes.get('/listAlarms', (req, res)=>{
-    res.render('listAlarms');
-    //res.send('esta es la raiz pai')
-});
+//------------------------EXTRAS------------------------------
 
 routes.get('/panel', (req, res)=>{
   res.render('panel');
   //res.send('esta es la raiz pai')
-});
-
-
-routes.get('/alarma', async (req, res) => {
-  try {
-    // Verificar si el usuario está autenticado
-    if (!req.isAuthenticated()) {
-      // Si no está autenticado, mostrar un mensaje de acceso denegado
-      return res.status(401).send('Acceso denegado');
-    }
-
-    // Obtener el ID del usuario autenticado
-    const userId = req.user._id;
-
-    // Buscar las alarmas correspondientes al usuario en la base de datos
-    const alarmas = await Alarma.find({ usuario: userId });
-
-    // Pasar las alarmas del usuario a la plantilla
-    res.render('alarma', { Alarma: alarmas });
-  } catch (error) {
-    console.log("Ha ocurrido un error: ", error);
-    res.json("Error");
-  }
-});
-
-  
-
-  
-
-//---------------------------------MOSTRAR---------------------------------------------------
-routes.get('/mostrarAlarma', async (req, res) => {
-  try {
-    // Verificar si el usuario está autenticado
-    if (!req.isAuthenticated()) {
-      // Si no está autenticado, mostrar un mensaje de acceso denegado
-      return res.status(401).send('Acceso denegado');
-    }
-
-    // Obtener el ID del usuario autenticado
-    const userId = req.user._id;
-
-    // Buscar las alarmas del usuario en la base de datos
-    const alarms = await Alarm.find({ usuario: userId });
-
-    // Pasar las alarmas a la plantilla
-    res.render('mostrarAlarma', { alarms });
-  } catch (error) {
-    console.log("Ha ocurrido un error: ", error);
-    res.json("Error");
-  }
-});
-
-
-
-  
-routes.get('/mostrarP', async (req, res) => {
-  try {
-    // Verificar si el usuario está autenticado
-    if (!req.isAuthenticated()) {
-      // Si no está autenticado, mostrar un mensaje de acceso denegado
-      return res.status(401).send('Acceso denegado');
-    }
-
-    // Obtener el ID del usuario autenticado
-    const userId = req.user._id;
-
-    // Buscar el usuario en la base de datos
-    const user = await User.findById(userId);
-
-    // Pasar los datos del usuario a la plantilla
-    res.render('mostrarP', { User: [user] }); // Pasamos un array con un solo usuario
-  } catch (error) {
-    console.log("Ha ocurrido un error: ", error);
-    res.json("Error");
-  }
-});
-
-
-
-
-  
-
-//editar alarmas
-routes.get('/editarA/:id', (req, res) => {
-    // Buscamos la alarma con el ID especificado en la base de datos
-    const id = req.params.id;
-    Alarma.findById(id, (err, alarma) => {
-      if (err) {
-        console.error(err);
-        res.status(500).send('Error interno del servidor');
-      } else if (!alarma) {
-        res.status(404).send('Alarma no encontrada');
-      } else {
-        // Renderizamos la vista de edición de la alarma
-        res.render('editarA', { alarma: alarma });
-      }
-    });
-  });
-
-
-  routes.get('/editarU/:id', (req, res) => {
-    // Buscamos la alarma con el ID especificado en la base de datos
-    const id = req.params.id;
-    User.findById(id, (err, user) => {
-      if (err) {
-        console.error(err);
-        res.status(500).send('Error interno del servidor');
-      } else if (!user) {
-        res.status(404).send('Usuario no encontrado');
-      } else {
-        // Renderizamos la vista de edición de la alarma
-        res.render('editarU', { user: user });
-      }
-    });
-  });
-  //guardar alarma
-
-
-routes.post('/editar_alarma/:id', (req, res) => {
-  const id = req.params.id;
-  Alarma.findByIdAndUpdate(id, {
-    name: req.body.name,
-    date: req.body.date,
-    time: req.body.time,
-    servo: req.body.servo,
-    email: req.body.email,
-    active: req.body.active=false
-  }, (err, alarma) => {
-    if (err) {
-      console.error(err);
-      res.status(500).send('Error interno del servidor');
-    } else if (!alarma) {
-      res.status(404).send('Alarma no encontrada');
-    } else {
-      res.redirect('/alarma');
-    }
-  });
-});
-
-
-  routes.post('/editar_usuario/:id', async (req, res) => {
-    try {
-      const user = await User.findById(req.params.id);
-      user.nombre = req.body.name;
-      user.password = req.body.password;
-      user.email = req.body.email;
-        await user.save();
-      console.log(req.body)
-      console.log('Usuario Editado');
-      res.redirect('/mostrarP');
-    } catch (error) {
-      console.error(error);
-      res.json('Error al actualizar user');
-    }
-  });
-//BORRAR ALARMA
-routes.get('/borrarA/:id', async (req, res) => {
-    try {
-      const id = req.params.id;
-      await Alarma.findByIdAndRemove(id);
-      res.redirect('../alarma');
-    } catch (error) {
-      console.error(error);
-      res.json('Error al eliminar la alarma');
-    }
-  });
-  //borrar usuario
-  routes.get('/borrarU/:id', async (req, res) => {
-    try {
-      const id = req.params.id;
-      await User.findByIdAndRemove(id);
-      res.redirect('../login');
-    } catch (error) {
-      console.error(error);
-      res.json('Error al eliminar el usuario');
-    }
-  });
-
-
-
-
-
-  //------------------------EXTRAS------------------------------
-
-routes.get('/panel', (req, res)=>{
-    res.render('panel');
-    //res.send('esta es la raiz pai')
 });
 
 routes.get('/instructivo', (req, res)=>{
@@ -394,18 +164,9 @@ routes.get('/boni', (req, res)=>{
   //res.send('esta es la raiz pai')
 });
 
-
-
 ///////////////////foticos/////////////
 routes.get('/esquema', (req, res) => {
   res.render('esquema');
 });
-
-
-
-
-
-
-
 
 module.exports = routes;

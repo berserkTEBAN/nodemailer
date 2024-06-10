@@ -1,22 +1,42 @@
 const mongoose = require('mongoose');
+
 const usuarioSchema = new mongoose.Schema({
     nombre: {
         type: String,
         required: true
     },
-    password: {
+    edad: {
+        type: Number,
+        required: true
+    },
+    escolaridad: {
         type: String,
         required: true
     },
-    email: {
+    grupo: {
         type: String,
-        required: true   
+        required: true
+    },
+    vive_con: {
+        type: String,
+        required: true
+    },
+    fuente_referencia: {
+        type: String,
+        required: true
+    },
+    entrevistador: {
+        type: String,
+        required: true
+    },
+    correo: {
+        type: String,
+        required: true
     },
     active: {
         type: Boolean,
         required: true
     }
-    
 });
 
-module.exports = mongoose.model('usuario', usuarioSchema);
+module.exports = mongoose.model('Usuario', usuarioSchema);
