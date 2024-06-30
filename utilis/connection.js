@@ -5,8 +5,7 @@ const mongoose = require('mongoose');
 
 const connectMongoDB = () => {
     //esta se saca de mongo db al crear una cuenta y un cluster,nose por que la nombre test lmao u-u
-    const linkMongoDB = "mongodb+srv://luisfelipecruzesteban398:luis@cluster0.pc1l8ww.mongodb.net/citas"
-    
+    const linkMongoDB = "mongodb+srv://solorioarciniegaoswaldo:oswa1234@cluster0.ulyv0xh.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0/citas"
     mongoose.set('strictQuery', false);
     mongoose.connect(linkMongoDB)
     .then(() => {
