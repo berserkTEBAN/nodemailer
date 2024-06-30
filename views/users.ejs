@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Usuarios Registrados</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2 class="my-4">Citas Registradas</h2>
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Edad</th>
+                        <th>Escolaridad</th>
+                        <th>Grupo</th>
+                        <th>Vive Con</th>
+                        <th>Fuente de Referencia</th>
+                        <th>Entrevistador</th>
+                        <th>Correo</th>
+                        <th>Día de Cita</th>
+                        <th>Hora de Cita</th>
+                        <th>Activo</th>
+                        <th>Acciones</th> <!-- Nuevo campo para acciones -->
+                    </tr>
+                </thead>
+                <tbody id="tablaUsuarios">
+                    <!-- Aquí se agregarán dinámicamente los usuarios -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS y jQuery (opcional, solo si necesitas funcionalidades adicionales de Bootstrap) -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script>
+        // Este script se encarga de obtener los datos de los usuarios mediante una solicitud HTTP GET
+        fetch('/getuser')
+            .then(response => response.json())
+            .then(data => {
+                const tablaUsuarios = document.getElementById('tablaUsuarios');
+                data.forEach(usuario => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${usuario.nombre}</td>
+                        <td>${usuario.edad}</td>
+                        <td>${usuario.escolaridad}</td>
+                        <td>${usuario.grupo}</td>
+                        <td>${usuario.vive_con}</td>
+                        <td>${usuario.fuente_referencia}</td>
+                        <td>${usuario.entrevistador}</td>
+                        <td>${usuario.correo}</td>
+                        <td>${usuario.dia_cita}</td>
+                        <td>${usuario.hora_cita}</td>
+                        <td>${usuario.active}</td>
+                        <td>
+                            <button class="btn btn-danger btn-sm" onclick="eliminarUsuario('${usuario._id}')">Eliminar</button>
+                        </td>
+                    `;
+                    tablaUsuarios.appendChild(row);
+                });
+            })
+            .catch(error => console.error('Error al obtener usuarios:', error));
+
+        // Función para enviar una solicitud DELETE al servidor para eliminar un usuario
+        function eliminarUsuario(usuarioId) {
+            fetch(`/eliminar_usuario/${usuarioId}`, {
+                method: 'DELETE'
+            })
+            .then(response => {
+                if (response.ok) {
+                    alert('Usuario eliminado correctamente');
+                    // Actualizar la tabla después de eliminar el usuario
+                    location.reload();
+                } else {
+                    throw new Error('Error al eliminar usuario');
+                }
+            })
+            .catch(error => console.error('Error al eliminar usuario:', error));
+        }
+    </script>
+</body>
+</html>

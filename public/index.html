@@ -1,222 +1,213 @@
-                                        
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registration Form</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@600;400;700&display=swap" rel="stylesheet">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            outline: 0;
-            font-family: 'Source Sans Pro', sans-serif;
-        }
-
-        body {
-            background-position: center;
-            background-repeat: no-repeat;
-            background-size: cover;
-            background-attachment: fixed;
-            background-image: url("img/pas.jpg");
-        }
-
-        .inner { padding: 80px 20px; }
-
-        div#container {
-            width: 100%;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        div#container section {
-            display: flex;
-            justify-content: space-between;
-            width: 85%;
-            max-width: 960px;
-            margin: 30px 0;
-            background-color: rgba(68, 174, 164, 0.6);
-            border-radius: 30px;
-            overflow: hidden;
-            backdrop-filter: blur(5px);
-            text-align: center;
-            box-shadow: 0 2px 5px 0 #ffffff;
-        }
-
-        div#container section article {
-            width: 45%;
-            background-color: #ffffff;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        div#container section article h1 {
-            font-size: 60px;
-            font-weight: 700;
-            color: #000;
-        }
-
-        div#container section article p {
-            font-size: 20px;
-            color: #000;
-            margin-top: 10px;
-        }
-
-        div#container section article a.btn {
-            display: inline-block;
-            padding: 10px 30px;
-            border: #000 solid 2px;
-            border-radius: 25px;
-            font-size: 18px;
-            text-decoration: none;
-            margin-top: 30px;
-            font-weight: 600;
-            color: #000;
-            transition: 0.2s all ease;
-        }
-
-        div#container section article a.btn:hover {
-            background-color: #000;
-            color: #e3f1e8;
-        }
-
-        div#container section aside {
-            width: 55%;
-
-        }
-
-        div#container section aside h2 {
-            font-size: 40px;
-            color: #282828;
-            font-weight: 700;
-        }
-
-        div#container section aside p {
-            font-size: 20px;
-            color: #282828;
-        }
-
-        nav#socialLogin {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin: 15px 0;
-        }
-
-        nav#socialLogin a {
-            width: 50px;
-            height: 50px;
-            background-color: #fff;
-            margin: 0 10px;
-            border-radius: 100%;
-            background-position: center;
-            background-repeat: no-repeat;
-            background-size: 60%;
-            box-shadow: 0 2px 5px 0 #454545;
-        }
-
-        nav#socialLogin a.google { background-image: url('img/crome.png'); }
-        nav#socialLogin a.github {
-            background-image: url('img/twtbutton.png');
-            background-size: 70%;
-        }
-        nav#socialLogin a.linkedin {
-            background-image: url('img/gmail.png');
-            background-size: 45%;
-        }
-
-        form {
-            width: 90%;
-            max-width: 350px;
-            margin: 30px auto 0 auto;
-        }
-
-        form input[type=text],
-        form input[type=email],
-        form input[type=password] {
-            width: calc(100% - 55px);
-            border: none;
-            padding: 10px 15px 8px 40px;
-            margin: 8px 0;
-            font-size: 18px;
-            border-radius: 20px;
-            background-position: 4% 50%;
-            background-repeat: no-repeat;
-            background-size: 18px;
-        }
-
-        form input[type=text] { background-image: url('img/persona.png'); }
-
-        form input[type=email] { background-image: url('img/crome.png'); }
-        
-        form input[type=text2] { background-image: url('img/crome.png'); }
-
-        form input[type=password] { background-image: url('img/pass.png'); }
-
-        form button[type=submit] {
-            margin-top: 20px;
-            border: none;
-            background-color: #f1f1f1;
-            color: #000;
-            font-size: 20px;
-            font-weight: 600;
-            padding: 10px 30px;
-            border-radius: 25px;
-            transition: 0.2s all ease;
-            box-shadow: 0 2px 5px 0 #454545;
-        }
-
-        form button[type=submit]:hover {
-            background-color: rgb(247, 247, 247);
-            color: #f5004a;
-        }
-
-        @media(max-width: 760px)  {
-            div#container section {
-                flex-flow: column;
-            }
-
-            div#container section article,
-            div#container section aside {
-                width: 100%;
-            }
-        }
-
-
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Formulario con Calendario (Flatpickr)</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Flatpickr CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <style>
+    body {
+      background-image: url('/img/osva3.jpg'); /* Agregar imagen de fondo */
+      background-size: cover; /* Ajustar tamaño de la imagen */
+      background-position: center; /* Posición de la imagen */
+    }
+    .formulario {
+      background-color: rgba(255, 255, 255, 0.8); /* Color de fondo del formulario con transparencia */
+      border-radius: 10px; /* Bordes redondeados */
+      padding: 20px;
+      margin-top: 50px; /* Margen superior */
+    }
+    label {
+      font-weight: bold; /* Texto de los labels en negrita */
+    }
+    .btn-cafe {
+      background-color: #0bc1c7; /* Color café para el botón */
+      border-color: #000000; /* Borde café para el botón */
+    }
+  </style>
 </head>
 <body>
-    <div id="container">
-        <section>
-            <article>
-                <div class="inner">
-                    <h1>BIENVENIDOS</h1>
-                    <p>Registrate para una mejor experiencia</p>
-                    <a href="login" class="btn">Iniciar Sesion</a>
-                </div>
-            </article>
-            <aside>
-                <div class="inner">
-                    <h2>Registrate</h2>
-                    <p>Es muy facil</p>
-                    <form action="/register" method="post">
-                        <input type="text" name="nombre"   id="nombre" placeholder="Usuario">
-                        <input type="password" name="password"  id="password" placeholder="Password">
-                        <input type="email" name="email"  id="email"  placeholder="Correo">
-                        
-                        <button type="submit">Registrarte</button>
-                    </form>
-                </div>
-            </aside>
-        </section>
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-md-6">
+        <div class="formulario">
+          <h2 class="text-center mb-4">Bolillito</h2>
+          <h5 class="text-center mb-4" style="font-size: 15px;">¡Hola! Introduce tus datos, los estaremos enviando a tu correo.</h5>
+          <form id="contactForm" class="needs-validation" novalidate action="/register" method="POST">
+            <div class="mb-3">
+              <label for="nombre" class="form-label">Nombre</label>
+              <input type="text" class="form-control" id="nombre" name="nombre" required>
+              <div class="valid-feedback">¡Perfecto!</div>
+              <div class="invalid-feedback">Por favor, introduce tu nombre.</div>
+            </div>
+            <div class="mb-3">
+              <label for="edad" class="form-label">Edad</label>
+              <input type="number" class="form-control" id="edad" name="edad" required>
+              <div class="valid-feedback">¡Perfecto!</div>
+              <div class="invalid-feedback">Por favor, introduce tu edad.</div>
+            </div>
+            <div class="mb-3">
+              <label for="escolaridad" class="form-label">Escolaridad</label>
+              <input type="text" class="form-control" id="escolaridad" name="escolaridad" required>
+              <div class="valid-feedback">¡Perfecto!</div>
+              <div class="invalid-feedback">Por favor, introduce tu escolaridad.</div>
+            </div>
+            <div class="mb-3">
+              <label for="grupo" class="form-label">Grupo</label>
+              <input type="text" class="form-control" id="grupo" name="grupo" required>
+              <div class="valid-feedback">¡Perfecto!</div>
+              <div class="invalid-feedback">Por favor, introduce tu grupo.</div>
+            </div>
+            <div class="mb-3">
+              <label for="vive_con" class="form-label">Vive con</label>
+              <input type="text" class="form-control" id="vive_con" name="vive_con" required>
+              <div class="valid-feedback">¡Perfecto!</div>
+              <div class="invalid-feedback">Por favor, introduce con quién vives.</div>
+            </div>
+            <div class="mb-3">
+              <label for="fuente_referencia" class="form-label">Fuente de referencia</label>
+              <input type="text" class="form-control" id="fuente_referencia" name="fuente_referencia" required>
+              <div class="valid-feedback">¡Perfecto!</div>
+              <div class="invalid-feedback">Por favor, introduce tu fuente de referencia.</div>
+            </div>
+            <div class="mb-3">
+              <label for="entrevistador" class="form-label">Entrevistador o entrevistadores</label>
+              <input type="text" class="form-control" id="entrevistador" name="entrevistador" required>
+              <div class="valid-feedback">¡Perfecto!</div>
+              <div class="invalid-feedback">Por favor, introduce el nombre del entrevistador.</div>
+            </div>
+            <div class="mb-3">
+              <label for="correo" class="form-label">Correo Electrónico</label>
+              <input type="email" class="form-control" id="correo" name="correo" required>
+              <div class="valid-feedback">¡Perfecto!</div>
+              <div class="invalid-feedback">Por favor, introduce un correo válido.</div>
+            </div>
+            <div class="mb-3">
+              <label for="dia_cita" class="form-label">Día de la cita</label>
+              <input type="text" class="form-control" id="dia_cita" name="dia_cita" required readonly>
+              <div class="valid-feedback">¡Perfecto!</div>
+              <div class="invalid-feedback">Por favor, selecciona el día de la cita.</div>
+            </div>
+            <div class="mb-3">
+              <label for="hora_cita" class="form-label">Hora de la cita</label>
+              <select class="form-select" id="hora_cita" name="hora_cita" required>
+                <option value="">Selecciona la hora</option>
+                <option value="09:00">9:00 AM</option>
+                <option value="10:00">10:00 AM</option>
+                <option value="11:00">11:00 AM</option>
+                <option value="12:00">12:00 PM</option>
+                <option value="13:00">1:00 PM</option>
+                <option value="14:00">2:00 PM</option>
+                <option value="15:00">3:00 PM</option>
+              </select>
+              <div class="valid-feedback">¡Perfecto!</div>
+              <div class="invalid-feedback">Por favor, selecciona la hora de la cita.</div>
+            </div>
+            <input type="hidden" id="active" name="active" value="true">
+            <div class="text-center">
+              <button type="submit" class="btn btn-cafe">Iniciar</button>
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
+  </div>
+  <!-- Bootstrap JS (opcional, solo si necesitas funcionalidades de Bootstrap) -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Flatpickr JS -->
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script>
+    // Inicialización de Flatpickr para el campo de fecha
+    flatpickr("#dia_cita", {
+      // Configuración de opciones
+      enable: [
+        function(date) {
+          // Solo permitir días de lunes a viernes (de 1 a 5)
+          return date.getDay() >= 1 && date.getDay() <= 5; // 1 a 5 son lunes a viernes
+        }
+      ],
+      dateFormat: "Y-m-d", // Formato de fecha
+      minDate: "today", // La fecha mínima permitida es hoy
+      locale: {
+        firstDayOfWeek: 1 // Lunes como primer día de la semana
+      },
+      onChange: function(selectedDates, dateStr, instance) {
+        // Obtener la fecha seleccionada
+        var selectedDate = selectedDates[0];
+
+        // Formatear la fecha seleccionada para comparar con las citas ocupadas
+        var formattedDate = instance.formatDate(selectedDate, "Y-m-d");
+
+        // Hacer una solicitud al servidor para obtener las citas ocupadas para esa fecha
+        fetch('/citas_ocupadas')
+          .then(response => response.json())
+          .then(data => {
+            // Obtener el array de citas ocupadas
+            var citasOcupadas = data;
+
+            // Filtrar las horas ocupadas para la fecha seleccionada
+            var horasOcupadas = citasOcupadas
+              .filter(cita => cita.dia_cita === formattedDate)
+              .map(cita => cita.hora_cita);
+
+            // Actualizar las opciones del select de hora_cita
+            var selectHora = document.getElementById('hora_cita');
+            selectHora.innerHTML = '<option value="">Selecciona la hora</option>';
+            var options = [
+              { value: '09:00', text: '9:00 AM' },
+              { value: '10:00', text: '10:00 AM' },
+              { value: '11:00', text: '11:00 AM' },
+              { value: '12:00', text: '12:00 PM' },
+              { value: '13:00', text: '1:00 PM' },
+              { value: '14:00', text: '2:00 PM' },
+              { value: '15:00', text: '3:00 PM' }
+            ];
+
+            options.forEach(option => {
+              var optionElement = document.createElement('option');
+              optionElement.value = option.value;
+              optionElement.textContent = option.text;
+              if (horasOcupadas.includes(option.value)) {
+                optionElement.disabled = true;
+              }
+              selectHora.appendChild(optionElement);
+            });
+
+            // Reinicializar Flatpickr para actualizar las fechas bloqueadas dinámicamente
+            instance.redraw();
+          })
+          .catch(error => console.error('Error al obtener citas ocupadas:', error));
+      }
+    });
+
+    // Validación de formulario con Bootstrap
+    (function () {
+      'use strict'
+
+      // Busca todos los formularios a los que se les debe añadir la validación de Bootstrap
+      var forms = document.querySelectorAll('.needs-validation')
+
+      // Itera sobre ellos y previene el envío si no son válidos
+      Array.prototype.slice.call(forms)
+        .forEach(function (form) {
+          form.addEventListener('submit', function (event) {
+            if (!form.checkValidity()) {
+              event.preventDefault()
+              event.stopPropagation()
+            } else {
+              // Aquí puedes mostrar la alerta
+              var diaCita = document.getElementById('dia_cita').value;
+              var horaCita = document.getElementById('hora_cita').value;
+              alert("Tus datos han sido guardados correctamente. Tu cita está programada para el " + diaCita + " a las " + horaCita + ".");
+            }
+
+            form.classList.add('was-validated')
+          }, false)
+        })
+    })();
+  </script>
 </body>
 </html>

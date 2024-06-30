@@ -33,6 +33,14 @@ const usuarioSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    dia_cita: {
+        type: String, // O podrías usar Date si prefieres almacenar como objeto Date en MongoDB
+        required: true
+    },
+    hora_cita: {
+        type: String,
+        required: true
+    },
     active: {
         type: Boolean,
         required: true

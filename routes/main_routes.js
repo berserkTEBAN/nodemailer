@@ -60,13 +60,18 @@ routes.get('/salir', (req, res) => {
 routes.get('/login', (req, res) => {
   res.render('login');
 });
-
-// Ruta para el registro de usuarios
 routes.post('/register', async (req, res) => {
   try {
-    // Extraer los datos del cuerpo de la solicitud
-    const { nombre, edad, escolaridad, grupo, vive_con, fuente_referencia, entrevistador, correo, active } = req.body;
+    const { nombre, edad, escolaridad, grupo, vive_con, fuente_referencia, entrevistador, correo, dia_cita, hora_cita, active } = req.body;
     
+    // Verificar si ya existe una cita para la misma fecha y hora
+    const citaExistente = await Usuario.findOne({ dia_cita, hora_cita });
+
+    if (citaExistente) {
+      // Si ya existe una cita para esa fecha y hora, enviar un mensaje de error al usuario
+      return res.status(400).send('La fecha y hora seleccionadas ya están ocupadas. Por favor, elige otro horario.');
+    }
+
     // Crear un nuevo usuario con los datos proporcionados
     const nuevoUsuario = new Usuario({
       nombre,
@@ -77,55 +82,83 @@ routes.post('/register', async (req, res) => {
       fuente_referencia,
       entrevistador,
       correo,
+      dia_cita,
+      hora_cita,
       active
     });
 
     // Guardar el nuevo usuario en la base de datos
     await nuevoUsuario.save();
 
-    // Ruta y nombre de archivo de destino en el servidor
-    const destination = 'C:/Users/teban/DispBetter/estatico/img/osva.jpg';
+    // Resto del código para enviar correo, descargar imagen, etc.
 
-    // Descargar la imagen desde la URL
-    request('https://imgs.search.brave.com/IXwu4rLhRkjcu9rC3jop0DPZvVcwtmkpzY9pa8NqjgY/rs:fit:860:0:0/g:ce/aHR0cHM6Ly9pLnBp/bmltZy5jb20vb3Jp/Z2luYWxzLzFiL2Q4/LzM4LzFiZDgzOGM3/NjY5ZGJiNjUyZDAz/ZWMyMWQwZGM5NTcz/LmpwZw').pipe(fs.createWriteStream(destination)).on('close', function() {
-      // Configuración del correo electrónico
-      const mailOptions = {
-        from: 'felipece.ti21@utsjr.edu.mx',//Aqui pon tu correo que sera el emisor del correo 
-        to: correo,
-        subject: 'Registro exitoso',
-        text: `Tus datos han sido guardados exitosamente en nuestra base de datos. \n\n` +
-              `<b>Nombre:</b> ${nombre} \n` +
-              `<b>Edad:</b> ${edad} \n` +
-              `<b>Escolaridad:</b> ${escolaridad} \n` +
-              `<b>Grupo:</b> ${grupo} \n` +
-              `<b>Vive con:</b> ${vive_con} \n` +
-              `<b>Fuente de referencia:</b> ${fuente_referencia} \n` +
-              `<b>Entrevistador:</b> ${entrevistador} \n` +
-              `<b>Correo electrónico:</b> ${correo} \n` +
-              `Muchas gracias por compartirnos tus datos, ten un buen día!!`,
-        attachments: [{
-          filename: 'osva.jpg',
-          path: destination,
-          cid: 'unique@osva.jpg' // Id único para la imagen en el correo
-        }]
-      };
-
-      // Envío del correo electrónico
-      transporter.sendMail(mailOptions, function (error, info) {
-        if (error) {
-          console.log(error);
-        } else {
-          console.log('Correo enviado: ' + info.response);
-        }
-      });
-    });
-
-    // Redireccionar al usuario a la página de inicio de sesión después de registrar
     res.redirect('/home');
+    console.log("nuevousuaruio")
   } catch (error) {
-    // Manejar errores de forma adecuada
     console.error(error);
     res.status(500).send('Error en el registro de usuario');
+  }
+});
+
+// Endpoint GET para obtener fechas y horas ocupadas
+routes.get('/citas_ocupadas', async (req, res) => {
+  try {
+    // Consultar todas las citas existentes en la base de datos
+    const citasOcupadas = await Usuario.find({}, 'dia_cita hora_cita');
+
+    // Si no hay citas ocupadas, devolver un mensaje indicando que no hay citas registradas
+    if (citasOcupadas.length === 0) {
+      console.log('No hay citas registradas en la base de datos.');
+      return res.status(404).send('No hay citas registradas en la base de datos.');
+    }
+
+    // Si hay citas ocupadas, devolver un array con las fechas y horas ocupadas
+    const citas = citasOcupadas.map(cita => ({
+      dia_cita: cita.dia_cita,
+      hora_cita: cita.hora_cita
+    }));
+
+    // Imprimir en la consola las citas ocupadas
+    console.log('Citas ocupadas:');
+    citas.forEach(cita => {
+      console.log(`Fecha: ${cita.dia_cita}, Hora: ${cita.hora_cita}`);
+    });
+
+    // Enviar las citas ocupadas como respuesta
+    res.json(citas);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Error al obtener las citas ocupadas.');
+  }
+});
+//Obtener citas 
+routes.get('/getuser', async (req, res) => {
+  try {
+    // Aquí obtienes todos los usuarios registrados, por ejemplo
+    const usuarios = await Usuario.find().exec();
+    res.json(usuarios); // Devolver los usuarios como JSON
+    console.log(usuarios); // Mostrar los usuarios en la consola del servidor
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Error al obtener los usuarios');
+  }
+});
+// Ruta para eliminar un usuario por su ID
+routes.delete('/eliminar_usuario/:id', async (req, res) => {
+  const usuarioId = req.params.id;
+
+  try {
+      // Buscar y eliminar el usuario por su ID
+      const usuarioEliminado = await Usuario.findByIdAndDelete(usuarioId);
+
+      if (!usuarioEliminado) {
+          return res.status(404).send('Usuario no encontrado');
+      }
+
+      res.status(200).send('Usuario eliminado correctamente');
+  } catch (error) {
+      console.error('Error al eliminar usuario:', error);
+      res.status(500).send('Error al eliminar usuario');
   }
 });
 
@@ -160,7 +193,7 @@ routes.get('/instructivo', (req, res)=>{
 });
 
 routes.get('/boni', (req, res)=>{
-  res.render('boni');
+  res.render('users');
   //res.send('esta es la raiz pai')
 });
 
